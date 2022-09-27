@@ -1,4 +1,4 @@
-const { UNAUTHORIZED_TEXT, EXPIRED_TOKEN_TEXT, DEFAULT_ERROR_TEXT, CONFLICT_TEXT } = require("./constants");
+const { UNAUTHORIZED_TEXT, EXPIRED_TOKEN_TEXT, DEFAULT_ERROR_TEXT, CONFLICT_TEXT, NOT_FOUND_TEXT } = require("./constants");
 
 function defaultError(res) {
   return res
