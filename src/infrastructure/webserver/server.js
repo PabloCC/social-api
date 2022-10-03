@@ -8,7 +8,7 @@ module.exports = {
     server.use(express.json());
     server.use(bodyParser.json());
     server.use(bodyParser.urlencoded({extended: false}));
-    server.use(express.static(__dirname));
+    server.use(express.static('public'));
     
     // Routes
     server.use(userRoutes.init(repositories));

@@ -15,7 +15,7 @@ const repositories = {
 try {
   // Connect to database
   dbInstance.connect()
-  .then((connection) => {
+  .then(() => {
     // Start server
     const serverInstance = server.create(repositories);
     server.start(serverInstance);

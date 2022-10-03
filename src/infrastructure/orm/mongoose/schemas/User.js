@@ -28,19 +28,8 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre('save', function (next) {
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) {
-      return next(err);
-    }
-    bcrypt.hash(this.password, salt, (error, hash) => {
-      if (error) {
-        return next(error);
-      }
-      this.password = hash;
-      this.created = moment().toJSON();
-      return next();
-    });
-  });
+  this.created = moment().toJSON();
+  return next();
 });
 
 const UserDao = model('User', UserSchema);

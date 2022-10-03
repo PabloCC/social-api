@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  background-color: #EEE5E9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Open Sans Condensed', sans-serif;
+}
+
+.card {
+  width: 300px;
+  height: 100px;
+  box-shadow: 1px 5px 15px #CCC;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFF;
+  border-top: 10px solid #70C1B3;
+}
+
