@@ -34,12 +34,12 @@ function init ({ userRepository }) {
   async function createUser(req, res) {
     const { firstName, lastName, email, password } = req.body;
 
-    const userFounded = await FindUser(false, email, { userRepository });
-    if (userFounded) {
-      return conflictError(res);
-    }
-
     try {
+      const userFounded = await FindUser(false, email, { userRepository });
+      if (userFounded) {
+        return conflictError(res);
+      }
+
       const user = await CreateUser(firstName, lastName, email, password, { userRepository });
       return res
         .status(201)
@@ -62,22 +62,28 @@ function init ({ userRepository }) {
    */
   async function login(req, res) {
     const { email, password } = req.body;
-    const user = await FindUser(false, email, {userRepository});
-    if (!user) {
-      return unauthorizedError(res);
-    }
-
-    const isValidPassword = await PasswordManager.isValidPassword(password, user.password);
-    if (!isValidPassword) {
-      return unauthorizedError(res);
-    }
-
-    const token = await AccessTokenManager.generate(user);
-    return res.send({
-      data: {
-        token
+    
+    try {
+      const user = await FindUser(false, email, {userRepository});
+      if (!user) {
+        return unauthorizedError(res);
       }
-    });
+
+      const isValidPassword = await PasswordManager.isValidPassword(password, user.password);
+      if (!isValidPassword) {
+        return unauthorizedError(res);
+      }
+
+      const token = await AccessTokenManager.generate(user);
+      return res.send({
+        data: {
+          token
+        }
+      });
+    } catch (err) {
+      console.log(err);
+      return defaultError(res);
+    }
   }
 
   /**
@@ -89,16 +95,16 @@ function init ({ userRepository }) {
   async function deleteUser(req, res) {
     const { id } = req.params;
     const user = await FindUser(id, false, {userRepository});
-
-    if (!user) {
-      return res.send({
-        data: {
-          message: 'User not found'
-        }
-      });
-    }
-
+    
     try {
+      if (!user) {
+        return res.send({
+          data: {
+            message: 'User not found'
+          }
+        });
+      }
+
       await DeleteUser(id, {userRepository});
       return res.send({
         data: {
@@ -119,18 +125,18 @@ function init ({ userRepository }) {
   async function updateUser(req, res) {
     const { id } = req.params;
     const { firstName, lastName, email } = req.body;
-    const user = await FindUser(id, false, {userRepository});
-    const userFounded = await FindUser(false, email, { userRepository });
-
-    if (!user) {
-      return notFoundError(res);
-    }
-
-    if (userFounded && userFounded._id !== user._id) {
-      return conflictError(res);
-    }
-
+    
     try {
+      const user = await FindUser(id, false, {userRepository});
+      if (!user) {
+        return notFoundError(res);
+      }
+      
+      const userFounded = await FindUser(false, email, { userRepository });
+      if (userFounded && userFounded._id !== user._id) {
+        return conflictError(res);
+      }
+
       const userUpdated = await UpdateUser(id, firstName, lastName, email, { userRepository });
       return res.send({
         data: {

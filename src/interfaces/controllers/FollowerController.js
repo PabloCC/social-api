@@ -3,7 +3,7 @@ const ListFollowingsByUser = require('../../application/use_cases/ListFollowings
 const FollowUser = require('../../application/use_cases/FollowUser');
 const FindFollower = require('../../application/use_cases/FindFollower');
 const UnfollowUser = require('../../application/use_cases/UnfollowUser');
-const { conflictError, defaultError, notFoundError } = require('../responses/errors');
+const { unauthorizedError, conflictError, defaultError, notFoundError } = require('../responses/errors');
 
 function init ({ followerRepository }) {
   /**
@@ -14,11 +14,16 @@ function init ({ followerRepository }) {
    */
   async function listFollowersByUser(req, res) {
     const { userId } = req.params;
-    const followers = await ListFollowersByUser(userId, { followerRepository }) || [];
-    return res.send({data: { 
-      user: userId,
-      followers 
-    }});
+
+    try {
+      const followers = await ListFollowersByUser(userId, { followerRepository }) || [];
+      return res.send({data: { 
+        user: userId,
+        followers 
+      }});
+    } catch (err) {
+      return defaultError(res);
+    }
   }
 
   /**
@@ -29,11 +34,16 @@ function init ({ followerRepository }) {
    */
   async function listFollowingsByUser(req, res) {
     const { userId } = req.params;
-    const followings = await ListFollowingsByUser(userId, { followerRepository }) || [];
-    return res.send({data: {
-      user: userId,
-      followings
-    }});
+
+    try {
+      const followings = await ListFollowingsByUser(userId, { followerRepository }) || [];
+      return res.send({data: {
+        user: userId,
+        followings
+      }});
+    } catch (err) {
+      return defaultError(res);
+    }
   }
 
   /**
@@ -45,13 +55,18 @@ function init ({ followerRepository }) {
   async function followUser(req, res) {
     const { userId } = req.params;
     const { followerId } = req.body;
-
-    const followerFounded = await FindFollower(null, userId, followerId, { followerRepository });
-    if (followerFounded) {
-      return conflictError(res);
-    }
+    const { user } = req;
 
     try {
+      if (user.id !== userId) {
+        return unauthorizedError(res);
+      }
+
+      const followerFounded = await FindFollower(null, userId, followerId, { followerRepository });
+      if (followerFounded || userId === followerId) {
+        return conflictError(res);
+      }
+
       const follower = await FollowUser(userId, followerId, { followerRepository });
       return res
         .status(201)
@@ -74,12 +89,12 @@ function init ({ followerRepository }) {
   async function unfollowUser(req, res) {
     const { id } = req.params;
 
-    const follow = await FindFollower(id, null, null, { followerRepository });
-    if (!follow) {
-      return notFoundError(res);
-    }
-
     try {
+      const follow = await FindFollower(id, null, null, { followerRepository });
+      if (!follow) {
+        return notFoundError(res);
+      }
+
       await UnfollowUser(id, { followerRepository });
       return res
         .send({
