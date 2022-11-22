@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const userRoutes = require('../../interfaces/routes/UserRoutes');
+const followerRoutes = require('../../interfaces/routes/FollowerRoutes');
 
 module.exports = {
   create: (repositories) => {
@@ -12,6 +13,7 @@ module.exports = {
     
     // Routes
     server.use(userRoutes.init(repositories));
+    server.use(followerRoutes.init(repositories));
 
     return server;
   },

@@ -1,5 +1,4 @@
 const moment = require('moment');
-const bcrypt = require('bcrypt');
 
 const {
   model,

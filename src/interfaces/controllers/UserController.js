@@ -10,6 +10,12 @@ const { unauthorizedError, conflictError, defaultError, notFoundError } = requir
 
 function init ({ userRepository }) {
 
+  /**
+   * List users
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - List of users
+   */
   async function listUsers(req, res) {
     try {
       const users = await ListUsers({ userRepository });
@@ -19,6 +25,12 @@ function init ({ userRepository }) {
     }
   }
 
+  /**
+   * Create user
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - User created
+   */
   async function createUser(req, res) {
     const { firstName, lastName, email, password } = req.body;
 
@@ -42,6 +54,12 @@ function init ({ userRepository }) {
     }
   }
 
+  /**
+   * Login user
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Auth token
+   */
   async function login(req, res) {
     const { email, password } = req.body;
     const user = await FindUser(false, email, {userRepository});
@@ -62,6 +80,12 @@ function init ({ userRepository }) {
     });
   }
 
+  /**
+   * Delete user
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - User deleted
+   */
   async function deleteUser(req, res) {
     const { id } = req.params;
     const user = await FindUser(id, false, {userRepository});
@@ -86,6 +110,12 @@ function init ({ userRepository }) {
     }
   }
 
+  /**
+   * Update user
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - User updated
+   */
   async function updateUser(req, res) {
     const { id } = req.params;
     const { firstName, lastName, email } = req.body;
